@@ -1,0 +1,326 @@
+[
+  {
+    "code": "AGAFAL",
+    "label": "Agapanthus 'Africanus Albus'",
+    "category": "Agapanthes",
+    "basePrice": 18,
+    "stock": 42,
+    "description": "Blanche, taille 1m20.",
+    "options": [
+      {
+        "id": "Pe",
+        "label": "Petit",
+        "price": 18,
+        "defaultChecked": true,
+        "desc": ""
+      },
+      {
+        "id": "Gr",
+        "label": "Grand",
+        "price": 25,
+        "defaultChecked": false,
+        "desc": ""
+      },
+      {
+        "id": "Perte",
+        "label": "Perte",
+        "price": 0,
+        "defaultChecked": false,
+        "desc": ""
+      }
+    ]
+  },
+  {
+    "code": "AEBLBE",
+    "label": "Aeonium 'Blushing Beauty'",
+    "category": "Succulentes",
+    "basePrice": 5,
+    "stock": 18,
+    "description": "",
+    "options": [
+      {
+        "id": "Pe",
+        "label": "Petit",
+        "price": 18,
+        "defaultChecked": true,
+        "desc": ""
+      },
+      {
+        "id": "Gr",
+        "label": "Grand",
+        "price": 25,
+        "defaultChecked": false,
+        "desc": ""
+      },
+      {
+        "id": "Perte",
+        "label": "Perte",
+        "price": 0,
+        "defaultChecked": false,
+        "desc": ""
+      }
+    ]
+  },
+  {
+    "code": "AUDPRO",
+    "label": "Casque Audio Studio Réduction Active",
+    "category": "Audio & Acoustique",
+    "basePrice": 249,
+    "stock": 85,
+    "description": "Transducteurs 45mm béryllium, ANC adaptatif hybride, micro studio détachable.",
+    "options": [
+      {
+        "id": "coussinets_velours",
+        "label": "Coussinets mousse mémoire velours aéré",
+        "price": 19,
+        "defaultChecked": false,
+        "desc": "Idéal pour longues sessions d'écoute"
+      },
+      {
+        "id": "cable_tresse",
+        "label": "Câble tressé audiophile plaqué argent 3m",
+        "price": 29,
+        "defaultChecked": true,
+        "desc": "Jack 3.5mm et adaptateur 6.35mm neutrik"
+      },
+      {
+        "id": "etui_rigide",
+        "label": "Étui de transport blindé étanche",
+        "price": 24,
+        "defaultChecked": false,
+        "desc": "Emplacement compartimenté pour câbles"
+      },
+      {
+        "id": "calibrage_dsp",
+        "label": "Profil DSP acoustique calibré en laboratoire",
+        "price": 15,
+        "defaultChecked": false,
+        "desc": "Courbe de réponse Harman ciblée"
+      }
+    ]
+  },
+  {
+    "code": "VEHACC",
+    "label": "Support Télématique Embarquée Véhicule",
+    "category": "Automobile & Télématique",
+    "basePrice": 79,
+    "stock": 4,
+    "description": "Support tableau de bord avec verrouillage magnétique 15W et lecteur télématique ODB-II.",
+    "options": [
+      {
+        "id": "adaptateur_obd",
+        "label": "Module lecteur télématique OBD-II Bluetooth",
+        "price": 35,
+        "defaultChecked": true,
+        "desc": "Diagnostic moteur et conso en direct"
+      },
+      {
+        "id": "cable_masque",
+        "label": "Kit faisceau de câblage dissimulé 12V/24V",
+        "price": 14.5,
+        "defaultChecked": false,
+        "desc": "Fusible de protection coupe-circuit"
+      },
+      {
+        "id": "ventouse_gel",
+        "label": "Plaque ventouse adhésive nano-succion",
+        "price": 7,
+        "defaultChecked": false,
+        "desc": "Adhérence renforcée sur surfaces granuleuses"
+      }
+    ]
+  },
+  {
+    "code": "IOTSEN",
+    "label": "Capteur Environnemental LoRaWAN Industriel",
+    "category": "Industrie 4.0 & IoT",
+    "basePrice": 165,
+    "stock": 60,
+    "description": "Mesure température, humidité, CO2 et pression barométrique avec transmission longue portée.",
+    "options": [
+      {
+        "id": "etalonnage_cofrac",
+        "label": "Certificat d'étalonnage métrologique COFRAC",
+        "price": 45,
+        "defaultChecked": false,
+        "desc": "Rapport 5 points de température et hygrométrie"
+      },
+      {
+        "id": "pile_10ans",
+        "label": "Pile chlorure de thionyle durée 10 ans",
+        "price": 18.5,
+        "defaultChecked": true,
+        "desc": "Haute capacité 8500mAh grade industriel"
+      },
+      {
+        "id": "antenne_subghz",
+        "label": "Antenne omnidirectionnelle 868MHz renforcée",
+        "price": 11,
+        "defaultChecked": false,
+        "desc": "Connecteur SMA en laiton nickelé"
+      },
+      {
+        "id": "support_rail_din",
+        "label": "Support de fixation pour rail DIN industriel",
+        "price": 6.5,
+        "defaultChecked": false,
+        "desc": "Montage rapide en armoire électrique"
+      }
+    ]
+  },
+  {
+    "code": "MEDBOX",
+    "label": "Boîte Pilulier Connecté Sécurisé",
+    "category": "Santé & Médical",
+    "basePrice": 115,
+    "stock": 0,
+    "description": "Dispensation programmée, rappels visuels/sonores et alerte proche via réseau cellulaire.",
+    "options": [
+      {
+        "id": "sim_m2m",
+        "label": "Carte SIM multi-opérateurs Europe 12 mois",
+        "price": 24,
+        "defaultChecked": true,
+        "desc": "Connectivité roaming 4G/2G incluse"
+      },
+      {
+        "id": "cle_verrou",
+        "label": "Serrure physique antivol à clé cylindrique",
+        "price": 14,
+        "defaultChecked": false,
+        "desc": "Double de clé fourni avec badge"
+      },
+      {
+        "id": "alarme_haute_voix",
+        "label": "Synthèse vocale d'assistance renforcée",
+        "price": 9,
+        "defaultChecked": false,
+        "desc": "Messages vocaux personnalisés en français"
+      }
+    ]
+  },
+  {
+    "code": "HOMAUT",
+    "label": "Passerelle Domotique Zigbee / Matter",
+    "category": "Maison Connectée",
+    "basePrice": 99,
+    "stock": 27,
+    "description": "Contrôleur multi-protocoles Matter over Thread, Zigbee 3.0 et local Ethernet.",
+    "options": [
+      {
+        "id": "batterie_secours",
+        "label": "Module onduleur batterie tampon 2h",
+        "price": 26,
+        "defaultChecked": false,
+        "desc": "Maintien des automatismes en cas de coupure secteur"
+      },
+      {
+        "id": "cables_blindes",
+        "label": "Câble réseau Cat7 blindé sans halogène 2m",
+        "price": 9,
+        "defaultChecked": true,
+        "desc": "Transmission sans interférence électromagnétique"
+      },
+      {
+        "id": "cle_usb_thread",
+        "label": "Dongle coordinateur radio USB supplémentaire",
+        "price": 21,
+        "defaultChecked": false,
+        "desc": "Extension de maillage radio multi-étage"
+      }
+    ]
+  },
+  {
+    "code": "ROBDEV",
+    "label": "Bras Robotique Éducatif 4 Axes",
+    "category": "Robotique & Éducation",
+    "basePrice": 290,
+    "stock": 12,
+    "description": "Structure aluminium usiné CNC, servomoteurs couple élevé avec encodeurs magnétiques.",
+    "options": [
+      {
+        "id": "pince_pneumatique",
+        "label": "Préhenseur pince pneumatique ventouse",
+        "price": 38,
+        "defaultChecked": false,
+        "desc": "Mini-pompe à vide 12V intégrée"
+      },
+      {
+        "id": "camera_vision",
+        "label": "Module caméra vision IA reconnaissance forme",
+        "price": 54,
+        "defaultChecked": true,
+        "desc": "Capteur 5MP avec processeur NPU dédié"
+      },
+      {
+        "id": "joystick_manuel",
+        "label": "Pupitre de télécommande filaire analogique",
+        "price": 25,
+        "defaultChecked": false,
+        "desc": "Double manette de pilotage direct"
+      }
+    ]
+  },
+  {
+    "code": "SOLPNL",
+    "label": "Panneau Solaire Pliable Nomade 100W",
+    "category": "Énergie & Outdoor",
+    "basePrice": 185,
+    "stock": 33,
+    "description": "Cellules monocristallines SunPower rendement 24%, revêtement ETFE étanche et régulateur MPPT.",
+    "options": [
+      {
+        "id": "regulateur_mppt",
+        "label": "Régulateur MPPT haute précision avec écran LCD",
+        "price": 32,
+        "defaultChecked": true,
+        "desc": "Rendement de charge accru de 30%"
+      },
+      {
+        "id": "connecteurs_mc4",
+        "label": "Kit câbles universels Anderson, MC4 et DC5521",
+        "price": 16,
+        "defaultChecked": true,
+        "desc": "Longueur 3 mètres haute flexibilité"
+      },
+      {
+        "id": "piquets_ancrage",
+        "label": "Lot de 4 piquets d'ancrage sol renforcés",
+        "price": 8,
+        "defaultChecked": false,
+        "desc": "Haute résistance au vent fort"
+      }
+    ]
+  },
+  {
+    "code": "CAMFLX",
+    "label": "Caméra d'Inspection Endoscopique HD",
+    "category": "Outillage & Diagnostic",
+    "basePrice": 142,
+    "stock": 9,
+    "description": "Sonde semi-rigide orientable 180° avec éclairage 8 LED et écran IPS 5 pouces.",
+    "options": [
+      {
+        "id": "sonde_double",
+        "label": "Sonde double objectif avant et latéral 90°",
+        "price": 29,
+        "defaultChecked": false,
+        "desc": "Commutation instantanée d'angle de vue"
+      },
+      {
+        "id": "carte_sd_64",
+        "label": "Carte micro-SD 64GB endurance extrême",
+        "price": 14,
+        "defaultChecked": true,
+        "desc": "Enregistrement vidéo continu 1080p"
+      },
+      {
+        "id": "embouts_aimant",
+        "label": "Kit embouts crochet, miroir et aimant néodyme",
+        "price": 9.5,
+        "defaultChecked": true,
+        "desc": "Récupération facile d'objets métalliques"
+      }
+    ]
+  }
+]
