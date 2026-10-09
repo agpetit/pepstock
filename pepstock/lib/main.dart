@@ -82,7 +82,17 @@ class _ProductOrderScreenState extends State<ProductOrderScreen> {
   Future<void> _initCatalogWithFallback() async {
     setState(() => _isLoadingCatalog = true);
     try {
+      // 1. On tente de s'authentifier d'abord pour générer/récupérer la clé API
+      // Remplacez par vos vrais identifiants ou passez reset: true si besoin
+      /*bool isLogged = await DolibarrService.instance.login('apetit', '4Remparts!1205', reset: true);
+      print(isLogged);
+      if (!isLogged) {
+        throw Exception("Échec de l'authentification (identifiants incorrects ou serveur injoignable).");
+      }*/
+
+      // 2. Si le login réussit, on télécharge le catalogue avec la clé validée
       final products = await DolibarrService.instance.fetchAndSyncProductsToSqlite();
+
       setState(() {
         _catalogSource = 'ERP (direct)';
         _isFallbackMode = false;
@@ -336,7 +346,8 @@ class _ProductOrderScreenState extends State<ProductOrderScreen> {
     await dbHelper.insertOrder(order);
 
     // 3. Appel de l'API REST en temps réel avec le payload complet des items
-    final syncResult = await ApiService.syncOrder(order);
+    //final syncResult = await ApiService.syncOrder(order);
+    final syncResult = await ApiService.syncStockMovements(order);
 
     // 4. Mise à jour SQLite du statut retourné par l'API REST
     await dbHelper.updateSyncStatus(

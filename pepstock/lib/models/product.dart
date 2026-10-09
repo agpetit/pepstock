@@ -53,6 +53,7 @@ class ProductOption {
 }
 
 class Product {
+  final int id;
   final String code;
   final String label;
   final String category;
@@ -62,6 +63,7 @@ class Product {
   final List<ProductOption> options;
 
   Product({
+    this.id = 0,
     required this.code,
     required this.label,
     required this.category,
@@ -82,6 +84,7 @@ class Product {
     }
 
     return Product(
+      id: json['id'] as int,
       code: (json['code'] as String).toUpperCase(),
       label: json['label'] as String,
       category: json['category'] as String? ?? 'Général',
@@ -94,6 +97,7 @@ class Product {
 
   Map<String, dynamic> toMap() {
     return {
+      'id' : id,
       'code': code.toUpperCase(),
       'label': label,
       'category': category,

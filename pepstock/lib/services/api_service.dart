@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import '../models/order_record.dart';
+import 'dolibarr_service.dart'; // Import indispensable pour récupérer la session
 
 class SyncResult {
   final bool success;
@@ -19,54 +20,89 @@ class SyncResult {
 }
 
 class ApiService {
-  static String baseUrl = 'https://ais-dev-htkxdseq5au5n5b7y6tb7b-214327717164.europe-west2.run.app';
+  static int defaultWarehouseId = 1;
 
-  static Future<SyncResult> syncOrder(OrderRecord order) async {
-    final endpoint = Uri.parse('$baseUrl/api/sync');
+  /// Envoie chaque article de la commande comme un mouvement de stock
+  static Future<SyncResult> syncStockMovements(OrderRecord order) async {
+    // 1. Récupération dynamique de la configuration depuis DolibarrService
+    final baseUrl = DolibarrService.instance.baseUrl;
+    final apiKey = DolibarrService.instance.apiKey;
 
-    try {
-      final payload = jsonEncode(order.toRestPayload());
-      
-      final response = await http.post(
-        endpoint,
-        headers: {
-          'Content-Type': 'application/json; charset=UTF-8',
-          'Accept': 'application/json',
-          'X-Client-Platform': 'Flutter-Mobile',
-        },
-        body: payload,
-      ).timeout(const Duration(seconds: 10));
-
-      final responseBody = jsonDecode(response.body);
-
-      if (response.statusCode >= 200 && response.statusCode < 300) {
-        return SyncResult(
-          success: true,
-          message: responseBody['message'] ?? 'Synchronisation réussie.',
-          syncId: responseBody['syncId'],
-          statusCode: response.statusCode,
-          data: responseBody,
-        );
-      } else {
-        return SyncResult(
-          success: false,
-          message: responseBody['message'] ?? 'Erreur serveur ${response.statusCode}',
-          statusCode: response.statusCode,
-          data: responseBody,
-        );
-      }
-    } catch (e) {
+    // Sécurité : on vérifie que l'utilisateur est bien authentifié
+    if (apiKey == null) {
       return SyncResult(
         success: false,
-        message: 'Erreur réseau lors de la synchronisation : $e',
-        statusCode: 0,
+        message: 'Erreur : Aucune session active (clé API manquante). Veuillez vous reconnecter.',
+        statusCode: 401,
+      );
+    }
+
+    // 2. Construction propre de l'URL pour les mouvements de stock
+    final cleanUrl = baseUrl.replaceAll(RegExp(r'/+$'), '');
+    final endpoint = Uri.parse('$cleanUrl/api/index.php/stockmovements');
+
+    bool allSuccess = true;
+    List<String> errorMessages = [];
+    int successCount = 0;
+
+    for (var item in order.items) {
+      int stockQty = -(item.quantity);
+
+      final payload = jsonEncode({
+        'product_id': item.id, // L'ID technique interne (ex: 45)
+        'warehouse_id': defaultWarehouseId,
+        'qty': stockQty,
+        'label': 'Sortie pepStock - Ref: ${order.customerRef}',
+        'inventorycode': order.id,
+      });
+
+      try {
+        final response = await http.post(
+          endpoint,
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            'DOLAPIKEY': apiKey, // Utilisation de la clé dynamique mise en cache
+          },
+          body: payload,
+        ).timeout(const Duration(seconds: 10));
+
+        if (response.statusCode == 200 || response.statusCode == 201) {
+          successCount++;
+        } else {
+          allSuccess = false;
+          final errorData = jsonDecode(response.body);
+          final msg = errorData['error']?['message'] ?? 'Erreur HTTP ${response.statusCode}';
+          errorMessages.add('${item.productCode} : $msg');
+        }
+      } catch (e) {
+        allSuccess = false;
+        errorMessages.add('${item.productCode} : Erreur réseau ($e)');
+      }
+    }
+
+    if (allSuccess) {
+      return SyncResult(
+        success: true,
+        message: '$successCount mouvement(s) de stock synchronisé(s) avec succès.',
+        statusCode: 200,
+      );
+    } else {
+      return SyncResult(
+        success: false,
+        message: 'Échecs partiels ou totaux :\n${errorMessages.join("\n")}',
+        statusCode: 500,
       );
     }
   }
 
+  /// Vérification de la santé du serveur
   static Future<bool> checkHealth() async {
+    final baseUrl = DolibarrService.instance.baseUrl;
+    final cleanUrl = baseUrl.replaceAll(RegExp(r'/+$'), '');
+
     try {
-      final response = await http.get(Uri.parse('$baseUrl/api/health')).timeout(const Duration(seconds: 4));
+      final response = await http.get(Uri.parse('$cleanUrl/api/index.php/status')).timeout(const Duration(seconds: 4));
       return response.statusCode == 200;
     } catch (_) {
       return false;

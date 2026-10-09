@@ -1,5 +1,6 @@
 [
   {
+    "id": 0,
     "code": "AGAFAL",
     "label": "Agapanthus 'Africanus Albus'",
     "category": "Agapanthes",
@@ -31,6 +32,7 @@
     ]
   },
   {
+    "id": 1,
     "code": "AEBLBE",
     "label": "Aeonium 'Blushing Beauty'",
     "category": "Succulentes",

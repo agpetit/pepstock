@@ -29,7 +29,7 @@ class DatabaseHelper {
   Future<Database> get database async {
     if (_database != null) return _database!;
     ensureInitialized();
-    _database = await _initDB('product_inventory.db');
+    _database = await _initDB('product_inventory_2.db');
     return _database!;
   }
 
@@ -49,6 +49,7 @@ class DatabaseHelper {
     // 1. Table Produits
     await db.execute('''
       CREATE TABLE products (
+        id INTEGER,
         code TEXT PRIMARY KEY,
         label TEXT NOT NULL,
         category TEXT NOT NULL,

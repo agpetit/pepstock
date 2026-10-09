@@ -2,18 +2,24 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import '../models/product.dart';
 import 'database_helper.dart';
+import 'package:sqflite/sqflite.dart';
 
 class DolibarrService {
-  final String baseUrl; // Ex : "https://votre-erp.dolibarr.pro"
-  final String apiKey;  // DOLAPIKEY utilisateur Dolibarr
+  final String baseUrl;
+  final String apiKey;
 
-  DolibarrService({
+  // Singleton correctement initialisé avec votre clé fixe
+  static final DolibarrService instance = DolibarrService._internal(
+    baseUrl: 'http://dolipep',
+    apiKey: '43zITjH1X1A8Q8Zr9fxl2t5jKz5tfWET', // Clé API générée depuis la fiche utilisateur Dolibarr
+  );
+
+  DolibarrService._internal({
     required this.baseUrl,
     required this.apiKey,
   });
 
-  static get instance => null;
-
+  /// Récupération des produits avec la base URL et la clé API configurées
   Future<List<Product>> fetchAndSyncProductsToSqlite() async {
     final cleanUrl = baseUrl.replaceAll(RegExp(r'/+$'), '');
     final uri = Uri.parse('$cleanUrl/api/index.php/products?sortfield=t.ref&sortorder=ASC&limit=100');
@@ -32,6 +38,7 @@ class DolibarrService {
         final List<Product> products = [];
 
         final db = await DatabaseHelper.instance.database;
+        await db.delete('products');
         final batch = db.batch();
 
         for (final item in jsonList) {
@@ -44,19 +51,18 @@ class DolibarrService {
           }
 
           final product = Product(
+            // ATTENTION : Si vous implémentez les mouvements de stock, ajoutez l'ID ici !
+            id: int.tryParse(item['id'].toString()) ?? 0,
             code: ref,
             label: item['label'] as String? ?? 'Produit Pépinière',
             category: item['category'] as String? ?? 'ERP',
             basePrice: double.tryParse(item['price']?.toString() ?? '0') ?? 99.0,
             description: item['description'] as String? ?? 'Produit synchronisé depuis l\'ERP',
-            options: [
-              //ProductOption(id: 'opt_garantie_$ref', label: 'Garantie atelier 24 mois', price: 25.0, defaultChecked: false, desc: 'Support pièces et main-d\'œuvre'),
-              //ProductOption(id: 'opt_express_$ref', label: 'Livraison express prioritaire 24h', price: 12.0, defaultChecked: true, desc: 'Colisage sécurisé entrepôt'),
-            ],
+            options: [],
           );
 
           products.add(product);
-          batch.insert('products', product.toMap());
+          batch.insert('products', product.toMap(), conflictAlgorithm: ConflictAlgorithm.replace,);
         }
 
         await batch.commit(noResult: true);
