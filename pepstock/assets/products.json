@@ -1,0 +1,73 @@
+[
+  {
+    "id": 0,
+    "code": "AGAFAL",
+    "label": "Agapanthus 'Africanus Albus'",
+    "category": "Agapanthes",
+    "basePrice": 18,
+    "stock": 42,
+    "description": "Blanche, taille 1m20.",
+    "options": [
+      {
+        "id": "stade_petit",
+        "label": "Petit",
+        "price": 18,
+        "defaultChecked": true,
+        "desc": ""
+      },
+      {
+        "id": "stade_grand",
+        "label": "Grand",
+        "price": 25,
+        "defaultChecked": false,
+        "desc": ""
+      },
+      {
+        "id": "stade_perte",
+        "label": "Perte",
+        "price": 0,
+        "defaultChecked": false,
+        "desc": ""
+      }
+    ]
+  },
+  {
+    "id": 1,
+    "code": "AEBLBE",
+    "label": "Aeonium 'Blushing Beauty'",
+    "category": "Succulentes",
+    "basePrice": 5,
+    "stock": 18,
+    "description": "",
+    "options": [
+	{
+        "id": "stade_bouture",
+        "label": "Bouture",
+        "price": 0,
+        "defaultChecked": true,
+        "desc": ""
+      },
+      {
+        "id": "stade_petit",
+        "label": "Petit",
+        "price": 5,
+        "defaultChecked": false,
+        "desc": ""
+      },
+      {
+        "id": "stade_grand",
+        "label": "Grand",
+        "price": 10,
+        "defaultChecked": false,
+        "desc": ""
+      },
+      {
+        "id": "stade_perte",
+        "label": "Perte",
+        "price": 0,
+        "defaultChecked": false,
+        "desc": ""
+      }
+    ]
+  }
+]
