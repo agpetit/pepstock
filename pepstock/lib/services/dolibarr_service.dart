@@ -51,12 +51,12 @@ class DolibarrService {
           }
 
           final product = Product(
-            // ATTENTION : Si vous implémentez les mouvements de stock, ajoutez l'ID ici !
             id: int.tryParse(item['id'].toString()) ?? 0,
             code: ref,
             label: item['label'] as String? ?? 'Produit Pépinière',
             category: item['category'] as String? ?? 'ERP',
             basePrice: double.tryParse(item['price']?.toString() ?? '0') ?? 99.0,
+            stock: double.tryParse(item['stock'].toString()) ?? 0,
             description: item['description'] as String? ?? 'Produit synchronisé depuis l\'ERP',
             options: [],
           );

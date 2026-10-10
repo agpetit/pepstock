@@ -16,7 +16,6 @@ class DatabaseHelper {
   DatabaseHelper._init();
 
   /// Initialise la factory SQLite FFI sur Desktop (Windows, macOS, Linux)
-  /// Résout définitivement l'erreur: Bad state: databaseFactory not initialized
   static void ensureInitialized() {
     if (_ffiInitialized) return;
     if (!kIsWeb && (Platform.isWindows || Platform.isLinux || Platform.isMacOS)) {

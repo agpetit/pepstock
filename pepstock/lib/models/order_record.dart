@@ -3,6 +3,7 @@ import 'product.dart';
 
 class OrderItem {
   final String id;
+  final int productId;
   final String productCode;
   final String productLabel;
   final String category;
@@ -14,6 +15,7 @@ class OrderItem {
 
   OrderItem({
     required this.id,
+    required this.productId,
     required this.productCode,
     required this.productLabel,
     required this.category,
@@ -27,6 +29,7 @@ class OrderItem {
   Map<String, dynamic> toJson() {
     return {
       'id': id,
+      'productId': productId,
       'productCode': productCode,
       'productLabel': productLabel,
       'category': category,
@@ -47,6 +50,7 @@ class OrderItem {
 
     return OrderItem(
       id: json['id'] as String? ?? 'ITEM-${DateTime.now().millisecondsSinceEpoch}',
+      productId: (json['product_id'] as num?)?.toInt() ?? -1,
       productCode: (json['productCode'] ?? json['product_code'] ?? '') as String,
       productLabel: (json['productLabel'] ?? json['product_label'] ?? '') as String,
       category: json['category'] as String? ?? 'Général',
@@ -140,6 +144,7 @@ class OrderRecord {
       itemList = [
         OrderItem(
           id: 'LEGACY-${map['id']}',
+          productId: (map['product_id'] as num?)?.toInt() ?? -1,
           productCode: map['product_code'] as String? ?? '',
           productLabel: map['product_label'] as String? ?? '',
           category: map['category'] as String? ?? '',

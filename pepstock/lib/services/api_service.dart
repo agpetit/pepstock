@@ -20,15 +20,13 @@ class SyncResult {
 }
 
 class ApiService {
-  static int defaultWarehouseId = 1;
+  static int defaultWarehouseId = 18;
 
-  /// Envoie chaque article de la commande comme un mouvement de stock
   static Future<SyncResult> syncStockMovements(OrderRecord order) async {
     // 1. Récupération dynamique de la configuration depuis DolibarrService
     final baseUrl = DolibarrService.instance.baseUrl;
     final apiKey = DolibarrService.instance.apiKey;
 
-    // Sécurité : on vérifie que l'utilisateur est bien authentifié
     if (apiKey == null) {
       return SyncResult(
         success: false,
@@ -37,7 +35,7 @@ class ApiService {
       );
     }
 
-    // 2. Construction propre de l'URL pour les mouvements de stock
+    // 2. Construction de l'URL pour les mouvements de stock
     final cleanUrl = baseUrl.replaceAll(RegExp(r'/+$'), '');
     final endpoint = Uri.parse('$cleanUrl/api/index.php/stockmovements');
 
@@ -49,7 +47,7 @@ class ApiService {
       int stockQty = -(item.quantity);
 
       final payload = jsonEncode({
-        'product_id': item.id, // L'ID technique interne (ex: 45)
+        'product_id': item.productId, // L'ID technique interne (ex: 45)
         'warehouse_id': defaultWarehouseId,
         'qty': stockQty,
         'label': 'Sortie pepStock - Ref: ${order.customerRef}',
@@ -95,8 +93,6 @@ class ApiService {
       );
     }
   }
-
-  /// Vérification de la santé du serveur
   static Future<bool> checkHealth() async {
     final baseUrl = DolibarrService.instance.baseUrl;
     final cleanUrl = baseUrl.replaceAll(RegExp(r'/+$'), '');

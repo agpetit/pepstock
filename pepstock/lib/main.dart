@@ -187,6 +187,7 @@ class _ProductOrderScreenState extends State<ProductOrderScreen> {
     final selectedOpts = _currentOptions.where((o) => o.isSelected).map((o) => o.copyWith()).toList();
     final item = OrderItem(
       id: 'ITEM-${DateTime.now().millisecondsSinceEpoch}-${_accumulatedItems.length + 1}',
+      productId: _selectedProduct!.id,
       productCode: _selectedProduct!.code,
       productLabel: _selectedProduct!.label,
       category: _selectedProduct!.category,
@@ -207,21 +208,21 @@ class _ProductOrderScreenState extends State<ProductOrderScreen> {
 
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text('Article ${item.productCode} ajouté (${_accumulatedItems.length} article(s) sélectionné(s)) !'),
+        content: Text('Produit ${item.productCode} ajouté (${_accumulatedItems.length} produit(s) sélectionné(s)) !'),
         backgroundColor: Colors.blue.shade800,
         duration: const Duration(seconds: 2),
       ),
     );
   }
 
-  /// Supprime un article
+  /// Supprime un produit
   void _removeAccumulatedItem(int index) {
     setState(() {
       _accumulatedItems.removeAt(index);
     });
   }
 
-  /// Vide le panier d'articles
+  /// Vide le panier de produits
   void _clearAccumulatedItems() {
     setState(() {
       _accumulatedItems.clear();
@@ -230,7 +231,7 @@ class _ProductOrderScreenState extends State<ProductOrderScreen> {
 
   /// Valide et synchronise l'ensemble de la commande cumulée
   Future<void> _submitAndSyncCumulativeOrder() async {
-    // Si aucun article cumulé mais qu'un produit est actuellement configuré, on le prend en compte
+    // Si aucun produit cumulé mais qu'un produit est actuellement configuré, on le prend en compte
     if (_accumulatedItems.isEmpty) {
       if (_selectedProduct != null) {
         _addCurrentSelectionToOrder();
@@ -242,7 +243,7 @@ class _ProductOrderScreenState extends State<ProductOrderScreen> {
       }
     }
 
-    // Dialogue Material 3 de validation récapitulant toutes les lignes cumulées
+    // Dialogue Material 3 de validation récapitulant toutes les lignes sélectionnées
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
@@ -363,6 +364,7 @@ class _ProductOrderScreenState extends State<ProductOrderScreen> {
       _syncStatusMessage = syncResult.success
           ? 'Sélection (${itemsToSend.length} article(s)) synchronisée ERP !'
           : 'Échec REST : ${syncResult.message}. Enregistrée dans SQLite en attente.';
+      print(syncResult.message);
       if (syncResult.success) {
         _accumulatedItems.clear(); // Vider le panier après synchronisation
       }
@@ -755,7 +757,7 @@ class _ProductOrderScreenState extends State<ProductOrderScreen> {
                             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                           ),
                           onPressed: _addCurrentSelectionToOrder,
-                          icon: const Icon(Icons.add_shopping_cart_rounded),
+                          icon: const Icon(Icons.yard_rounded),
                           label: const Text(
                             'Ajouter cette sélection',
                             style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
@@ -797,10 +799,10 @@ class _ProductOrderScreenState extends State<ProductOrderScreen> {
                           children: [
                             Row(
                               children: [
-                                const Icon(Icons.shopping_cart_checkout_rounded, color: Color(0xFF1E40AF)),
+                                const Icon(Icons.yard_rounded, color: Color(0xFF1E40AF)),
                                 const SizedBox(width: 8),
                                 Text(
-                                  'Articles sélectionnés (${_accumulatedItems.length})',
+                                  'Produits sélectionnés (${_accumulatedItems.length})',
                                   style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
                                 ),
                               ],
@@ -840,7 +842,7 @@ class _ProductOrderScreenState extends State<ProductOrderScreen> {
                                 ),
                                 IconButton(
                                   icon: const Icon(Icons.close_rounded, size: 18, color: Colors.grey),
-                                  tooltip: 'Retirer cet article',
+                                  tooltip: 'Retirer ce produit',
                                   onPressed: () => _removeAccumulatedItem(idx),
                                 ),
                               ],
@@ -879,7 +881,7 @@ class _ProductOrderScreenState extends State<ProductOrderScreen> {
                                 ? const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
                                 : const Icon(Icons.cloud_upload_rounded),
                             label: Text(
-                              _isSyncing ? 'Synchronisation...' : 'Valider la sélection (${_accumulatedItems.length} article(s))',
+                              _isSyncing ? 'Synchronisation...' : 'Valider la sélection (${_accumulatedItems.length} produit(s))',
                               style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
                             ),
                           ),
