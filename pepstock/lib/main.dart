@@ -392,7 +392,7 @@ class _ProductOrderScreenState extends State<ProductOrderScreen> {
         actions: [
           IconButton(
             icon: const Icon(Icons.history_rounded),
-            tooltip: 'Historique SQLite',
+            tooltip: 'Historique',
             onPressed: () {
               Navigator.push(
                 context,
@@ -649,7 +649,7 @@ class _ProductOrderScreenState extends State<ProductOrderScreen> {
 
                 // Section 2 : Options dynamiques à cocher
                 const Text(
-                  'Options de variante',
+                  'Variantes',
                   style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 8),
