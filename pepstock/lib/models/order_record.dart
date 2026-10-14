@@ -8,8 +8,9 @@ class OrderItem {
   final String productLabel;
   final String category;
   final double basePrice;
-  final int quantity; // De -20 à +20
-  final List<ProductOption> selectedOptions;
+  final int quantity;
+  final List<ProductOption> selectedOptions; // Conservé pour rétrocompatibilité SQLite
+  final String movementLabel; // NOUVEAU CHAMP
   final double unitPrice;
   final double lineTotal;
 
@@ -22,6 +23,7 @@ class OrderItem {
     required this.basePrice,
     required this.quantity,
     required this.selectedOptions,
+    required this.movementLabel, // NOUVEAU
     required this.unitPrice,
     required this.lineTotal,
   });
@@ -36,6 +38,7 @@ class OrderItem {
       'basePrice': basePrice,
       'quantity': quantity,
       'selectedOptions': selectedOptions.map((o) => o.toJson()).toList(),
+      'movementLabel': movementLabel, // NOUVEAU
       'unitPrice': unitPrice,
       'lineTotal': lineTotal,
     };
@@ -57,6 +60,7 @@ class OrderItem {
       basePrice: (json['basePrice'] ?? json['base_price'] as num?)?.toDouble() ?? 0.0,
       quantity: (json['quantity'] as num?)?.toInt() ?? 1,
       selectedOptions: options,
+      movementLabel: json['movementLabel'] as String? ?? 'Mouvement de stock', // NOUVEAU
       unitPrice: (json['unitPrice'] ?? json['unit_price'] as num?)?.toDouble() ?? 0.0,
       lineTotal: (json['lineTotal'] ?? json['line_total'] as num?)?.toDouble() ?? 0.0,
     );
@@ -151,6 +155,7 @@ class OrderRecord {
           basePrice: (map['base_price'] as num?)?.toDouble() ?? 0.0,
           quantity: (map['total_quantity'] as num?)?.toInt() ?? 1,
           selectedOptions: options,
+          movementLabel: 'Ancien mouvement',
           unitPrice: (map['total_price'] as num?)?.toDouble() ?? 0.0,
           lineTotal: (map['total_price'] as num?)?.toDouble() ?? 0.0,
         )

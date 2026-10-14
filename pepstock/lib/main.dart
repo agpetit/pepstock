@@ -60,7 +60,6 @@ class _ProductOrderScreenState extends State<ProductOrderScreen> {
   final TextEditingController _customerController = TextEditingController();
 
   Product? _selectedProduct;
-  List<ProductOption> _currentOptions = [];
   bool _isSyncing = false;
   String? _syncStatusMessage;
   bool _syncSuccess = false;
@@ -72,6 +71,10 @@ class _ProductOrderScreenState extends State<ProductOrderScreen> {
   bool _isLoadingCatalog = false;
 
   final dbHelper = DatabaseHelper.instance;
+
+  String _selectedAction = 'Bouture';
+  String _lossReason = 'Humidité';
+
 
   @override
   void initState() {
@@ -134,40 +137,32 @@ class _ProductOrderScreenState extends State<ProductOrderScreen> {
     setState(() {
       _selectedProduct = product;
       _codeController.text = product.code;
-      // Duplication des options pour gestion de sélection dynamique
-      _currentOptions = product.options.map((opt) => opt.copyWith()).toList();
       _syncStatusMessage = null;
     });
   }
 
-  // Prix unitaire de la sélection en cours (produit + options cochées)
+  // Le calcul du prix unitaire se résume désormais au prix de base du produit
   double get _currentUnitPrice {
     if (_selectedProduct == null) return 0.0;
-    double total = _selectedProduct!.basePrice;
-    for (var opt in _currentOptions) {
-      if (opt.isSelected) {
-        total += opt.price;
-      }
-    }
-    return total;
+    return _selectedProduct!.basePrice;
   }
 
   // Sous-total de la sélection en cours
   double get _currentLineTotal => _currentUnitPrice * _quantity;
 
-  // Montant total cumulé de l'ensemble des articles du panier
+  // Montant total de l'ensemble des articles du panier
   double get _grandTotalPrice {
     return _accumulatedItems.fold(0.0, (acc, item) => acc + item.lineTotal);
   }
 
-  // Quantité totale cumulée
+  // Quantité totale
   int get _grandTotalQuantity {
     return _accumulatedItems.fold(0, (acc, item) => acc + item.quantity);
   }
 
   int _quantity = 1;
 
-  /// Ajoute la sélection en cours à la commande cumulée
+  /// Ajoute la sélection en cours à la commande
   void _addCurrentSelectionToOrder() {
     if (_selectedProduct == null) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -184,7 +179,11 @@ class _ProductOrderScreenState extends State<ProductOrderScreen> {
       return;
     }
 
-    final selectedOpts = _currentOptions.where((o) => o.isSelected).map((o) => o.copyWith()).toList();
+    String finalLabel = _selectedAction;
+    if (_selectedAction == 'Perte') {
+      finalLabel += ' - $_lossReason';
+    }
+
     final item = OrderItem(
       id: 'ITEM-${DateTime.now().millisecondsSinceEpoch}-${_accumulatedItems.length + 1}',
       productId: _selectedProduct!.id,
@@ -193,7 +192,8 @@ class _ProductOrderScreenState extends State<ProductOrderScreen> {
       category: _selectedProduct!.category,
       basePrice: _selectedProduct!.basePrice,
       quantity: _quantity,
-      selectedOptions: selectedOpts,
+      selectedOptions: [], // Les anciennes options dynamiques restent vides
+      movementLabel: finalLabel, // NOUVEAU
       unitPrice: _currentUnitPrice,
       lineTotal: _currentLineTotal,
     );
@@ -202,7 +202,8 @@ class _ProductOrderScreenState extends State<ProductOrderScreen> {
       _accumulatedItems.add(item);
       _selectedProduct = null;
       _codeController.clear();
-      _currentOptions = [];
+      _selectedAction = 'Bouture'; // Réinitialisation par défaut
+      _lossReason = 'Humidité';    // Réinitialisation par défaut
       _quantity = 1;
     });
 
@@ -229,7 +230,7 @@ class _ProductOrderScreenState extends State<ProductOrderScreen> {
     });
   }
 
-  /// Valide et synchronise l'ensemble de la commande cumulée
+  /// Valide et synchronise l'ensemble de la commande
   Future<void> _submitAndSyncCumulativeOrder() async {
     // Si aucun produit cumulé mais qu'un produit est actuellement configuré, on le prend en compte
     if (_accumulatedItems.isEmpty) {
@@ -278,7 +279,8 @@ class _ProductOrderScreenState extends State<ProductOrderScreen> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text('${it.productCode} - ${it.productLabel}', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
-                              Text('Qté: ${it.quantity > 0 ? "+${it.quantity}" : "${it.quantity}"} × ${it.unitPrice.toStringAsFixed(2)} € · ${it.selectedOptions.length} opt.', style: TextStyle(fontSize: 11, color: Colors.grey.shade700)),
+                              //Text('Qté: ${it.quantity > 0 ? "+${it.quantity}" : "${it.quantity}"} × ${it.unitPrice.toStringAsFixed(2)} € · ${it.selectedOptions.length} opt.', style: TextStyle(fontSize: 11, color: Colors.grey.shade700)),
+                              Text('Qté: ${it.quantity > 0 ? "+${it.quantity}" : "${it.quantity}"} · Action : ${it.movementLabel}', style: TextStyle(fontSize: 11, color: Colors.grey.shade600)),
                             ],
                           ),
                         ),
@@ -331,7 +333,7 @@ class _ProductOrderScreenState extends State<ProductOrderScreen> {
     final totalToSend = _grandTotalPrice;
     final totalQtyToSend = _grandTotalQuantity;
 
-    // 1. Création de la commande locale avec articles cumulés
+    // 1. Création de la commande locale
     final order = OrderRecord(
       id: orderId,
       items: itemsToSend,
@@ -492,8 +494,8 @@ class _ProductOrderScreenState extends State<ProductOrderScreen> {
                                 controller.clear();
                                 setState(() {
                                   _selectedProduct = null;
-                                  _currentOptions = [];
-                                });
+                                  _selectedAction = 'Bouture';
+                                  _lossReason = 'Humidité';                                });
                               },
                             )
                           : null,
@@ -541,7 +543,7 @@ class _ProductOrderScreenState extends State<ProductOrderScreen> {
                               subtitle: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text('${product.category} · ${product.basePrice.toStringAsFixed(2)} €'),
+                                  //Text('${product.category} · ${product.basePrice.toStringAsFixed(2)} €'),
                                   Text(
                                     'Stock disponible : ${product.stock.toStringAsFixed(0)} unités',
                                     style: TextStyle(
@@ -647,49 +649,57 @@ class _ProductOrderScreenState extends State<ProductOrderScreen> {
 
                 const SizedBox(height: 24),
 
-                // Section 2 : Options dynamiques à cocher
+                // Section 2 : Mouvement de stock (Options en dur)
                 const Text(
-                  'Variantes',
+                  'Type de mouvement',
                   style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 8),
 
-                ...List.generate(_currentOptions.length, (index) {
-                  final option = _currentOptions[index];
-                  return Padding(
-                    padding: const EdgeInsets.only(bottom: 8),
-                    child: Material(
-                      color: option.isSelected ? Colors.blue.shade50.withOpacity(0.5) : Colors.white,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10),
-                        side: BorderSide(
-                          color: option.isSelected ? Colors.blue.shade300 : Colors.grey.shade200,
-                        ),
-                      ),
-                      clipBehavior: Clip.antiAlias,
-                      child: CheckboxListTile(
-                        value: option.isSelected,
-                        title: Text(option.label, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500)),
-                        subtitle: Text(
-                          option.desc.isNotEmpty ? '${option.desc} (+ ${option.price.toStringAsFixed(2)} €)' : '+ ${option.price.toStringAsFixed(2)} €',
-                          style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
-                        ),
-                        secondary: Text(
-                          '+${option.price.toStringAsFixed(2)} €',
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            color: option.isSelected ? Colors.blue.shade800 : Colors.grey.shade700,
-                          ),
-                        ),
-                        onChanged: (val) {
+                Wrap(
+                  spacing: 8.0,
+                  children: ['Bouture', 'Rempotage', 'Perte', 'Autre'].map((String action) {
+                    return ChoiceChip(
+                      label: Text(action),
+                      selected: _selectedAction == action,
+                      selectedColor: Colors.blue.shade100,
+                      onSelected: (bool selected) {
+                        if (selected) {
                           setState(() {
-                            option.isSelected = val ?? false;
+                            _selectedAction = action;
                           });
+                        }
+                      },
+                    );
+                  }).toList(),
+                ),
+
+                // Affichage conditionnel des sous-options si "Perte" est coché
+                if (_selectedAction == 'Perte') ...[
+                  const SizedBox(height: 16),
+                  const Text(
+                    'Cause de la perte',
+                    style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.red),
+                  ),
+                  const SizedBox(height: 8),
+                  Wrap(
+                    spacing: 8.0,
+                    children: ['Humidité', 'Sécheresse', 'Maladie','Froid', 'Autre'].map((String reason) {
+                      return ChoiceChip(
+                        label: Text(reason),
+                        selected: _lossReason == reason,
+                        selectedColor: Colors.red.shade100,
+                        onSelected: (bool selected) {
+                          if (selected) {
+                            setState(() {
+                              _lossReason = reason;
+                            });
+                          }
                         },
-                      ),
-                    ),
-                  );
-                }),
+                      );
+                    }).toList(),
+                  ),
+                ],
 
                 const SizedBox(height: 16),
 
@@ -725,7 +735,7 @@ class _ProductOrderScreenState extends State<ProductOrderScreen> {
                   ),
                   child: Column(
                     children: [
-                      Row(
+                      /*Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Column(
@@ -741,6 +751,23 @@ class _ProductOrderScreenState extends State<ProductOrderScreen> {
                               color: _currentLineTotal < 0 ? Colors.orange.shade800 : const Color(0xFF1E40AF),
                               fontSize: 20,
                               fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      ),*/
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            'Quantité : $_quantity',
+                            style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+                          ),
+                          Text(
+                            _selectedAction == 'Perte' ? '$_selectedAction - $_lossReason' : _selectedAction,
+                            style: const TextStyle(
+                              color: Color(0xFF1E40AF),
+                              fontSize: 14,
+                              fontWeight: FontWeight.w600,
                             ),
                           ),
                         ],
@@ -832,7 +859,8 @@ class _ProductOrderScreenState extends State<ProductOrderScreen> {
                                     crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
                                       Text(it.productLabel, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13), maxLines: 1, overflow: TextOverflow.ellipsis),
-                                      Text('Qté: ${it.quantity > 0 ? "+${it.quantity}" : "${it.quantity}"} × ${it.unitPrice.toStringAsFixed(2)} € · ${it.selectedOptions.length} opt.', style: TextStyle(fontSize: 11, color: Colors.grey.shade600)),
+                                      //Text('Qté: ${it.quantity > 0 ? "+${it.quantity}" : "${it.quantity}"} × ${it.unitPrice.toStringAsFixed(2)} € · ${it.selectedOptions.length} opt.', style: TextStyle(fontSize: 11, color: Colors.grey.shade600)),
+                                      Text('Qté: ${it.quantity > 0 ? "+${it.quantity}" : "${it.quantity}"} · Action : ${it.movementLabel}', style: TextStyle(fontSize: 11, color: Colors.grey.shade700)),
                                     ],
                                   ),
                                 ),
@@ -941,7 +969,7 @@ class OrderHistoryScreen extends StatelessWidget {
             return const Center(child: Text('Aucune sélection enregistrée en base SQLite.'));
           }
 
-          return ListView.separated(
+          /*return ListView.separated(
             padding: const EdgeInsets.all(16),
             itemCount: orders.length,
             separatorBuilder: (_, __) => const SizedBox(height: 12),
@@ -974,6 +1002,64 @@ class OrderHistoryScreen extends StatelessWidget {
                       const SizedBox(height: 4),
                       Text('Total: ${o.totalPrice.toStringAsFixed(2)} € · ${o.createdAt.toString().substring(0, 16)}',
                           style: const TextStyle(fontSize: 12, color: Colors.grey)),
+                    ],
+                  ),
+                ),
+              );
+            },
+          );*/
+
+          return ListView.separated(
+            padding: const EdgeInsets.all(16),
+            itemCount: orders.length,
+            separatorBuilder: (_, __) => const SizedBox(height: 12),
+            itemBuilder: (context, index) {
+              final o = orders[index];
+              final isSynced = o.syncStatus == 'synced';
+
+              // Concaténation des types de mouvements des articles
+              final movementsSummary = o.items.isEmpty
+                  ? 'Aucun mouvement'
+                  : o.items.map((item) => '${item.productCode} (${item.movementLabel})').join(', ');
+
+              return Card(
+                elevation: 1,
+                child: Padding(
+                  padding: const EdgeInsets.all(12.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Expanded(
+                            child: Text(
+                              o.productLabel,
+                              style: const TextStyle(fontWeight: FontWeight.bold),
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          Text(
+                            isSynced ? 'SYNCHRONISÉ' : 'EN ATTENTE',
+                            style: TextStyle(
+                              color: isSynced ? Colors.green : Colors.orange,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 12,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 6),
+                      Text(
+                        'Mouvements : $movementsSummary',
+                        style: TextStyle(fontSize: 13, color: Colors.grey.shade800),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        'Qté totale: ${o.totalQuantity} u. · Date: ${o.createdAt.toString().substring(0, 16)}',
+                        style: const TextStyle(fontSize: 12, color: Colors.grey),
+                      ),
                     ],
                   ),
                 ),

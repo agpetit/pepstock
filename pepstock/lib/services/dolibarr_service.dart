@@ -10,8 +10,8 @@ class DolibarrService {
 
   // Singleton correctement initialisé avec votre clé fixe
   static final DolibarrService instance = DolibarrService._internal(
-    baseUrl: 'http://dolipep',
-    apiKey: '43zITjH1X1A8Q8Zr9fxl2t5jKz5tfWET', // Clé API générée depuis la fiche utilisateur Dolibarr
+    baseUrl: 'https://www.dolibarr.pepiniere-brehat.com',
+    apiKey: 'c1X69fT08f7MQxJfN3iN8AYxW1wTn9cr', // Clé API générée depuis la fiche utilisateur Dolibarr
   );
 
   DolibarrService._internal({
@@ -22,7 +22,7 @@ class DolibarrService {
   /// Récupération des produits avec la base URL et la clé API configurées
   Future<List<Product>> fetchAndSyncProductsToSqlite() async {
     final cleanUrl = baseUrl.replaceAll(RegExp(r'/+$'), '');
-    final uri = Uri.parse('$cleanUrl/api/index.php/products?sortfield=t.ref&sortorder=ASC&limit=100');
+    final uri = Uri.parse('$cleanUrl/api/index.php/products?sortfield=t.ref&sortorder=ASC&limit=10000');
 
     try {
       final response = await http.get(

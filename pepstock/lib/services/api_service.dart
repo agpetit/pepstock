@@ -46,12 +46,19 @@ class ApiService {
     for (var item in order.items) {
       int stockQty = -(item.quantity);
 
+      String movementLabel = item.movementLabel;
+      if (order.notes.trim().isNotEmpty) {
+        movementLabel += ' - ${order.notes.trim()}';
+      }
+
+      print(order.id);
+
       final payload = jsonEncode({
-        'product_id': item.productId, // L'ID technique interne (ex: 45)
+        'product_id': item.productId,
         'warehouse_id': defaultWarehouseId,
         'qty': stockQty,
-        'label': 'Sortie pepStock - Ref: ${order.customerRef}',
-        'inventorycode': order.id,
+        'label': movementLabel, // UTILISATION DU NOUVEAU CHAMP
+        'movementcode': order.id,
       });
 
       try {

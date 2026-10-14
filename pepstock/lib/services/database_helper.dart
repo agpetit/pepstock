@@ -1,10 +1,11 @@
 import 'dart:convert';
-import 'dart:io';
+import 'dart:io' show Platform;
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
+import 'package:sqflite_common_ffi_web/sqflite_ffi_web.dart'; // Import Web
 import '../models/product.dart';
 import '../models/order_record.dart';
 
@@ -15,10 +16,15 @@ class DatabaseHelper {
 
   DatabaseHelper._init();
 
-  /// Initialise la factory SQLite FFI sur Desktop (Windows, macOS, Linux)
+  /// Initialise la factory SQLite adaptée (Web, Desktop ou Mobile)
   static void ensureInitialized() {
     if (_ffiInitialized) return;
-    if (!kIsWeb && (Platform.isWindows || Platform.isLinux || Platform.isMacOS)) {
+
+    if (kIsWeb) {
+      // Configuration SQLite pour navigateur Chrome / Web
+      databaseFactory = databaseFactoryFfiWeb;
+    } else if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
+      // Configuration Desktop
       sqfliteFfiInit();
       databaseFactory = databaseFactoryFfi;
     }
@@ -132,7 +138,7 @@ class DatabaseHelper {
           ELSE 3
         END,
         code ASC
-      LIMIT 10
+      LIMIT 10000
     ''', ['%$cleanQuery%', '%$cleanQuery%', cleanQuery, '$cleanQuery%']);
 
     return results.map((e) => Product.fromJson(e)).toList();
