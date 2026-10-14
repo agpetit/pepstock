@@ -11,7 +11,7 @@ class DolibarrService {
   // Singleton correctement initialisé avec votre clé fixe
   static final DolibarrService instance = DolibarrService._internal(
     baseUrl: 'https://www.dolibarr.pepiniere-brehat.com',
-    apiKey: 'c1X69fT08f7MQxJfN3iN8AYxW1wTn9cr', // Clé API générée depuis la fiche utilisateur Dolibarr
+    apiKey: '2JaSoAn6GWBr9xJ53Fv30KlIoa1C2d7t', // Clé API générée depuis la fiche utilisateur Dolibarr
   );
 
   DolibarrService._internal({

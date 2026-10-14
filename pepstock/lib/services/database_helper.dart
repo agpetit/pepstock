@@ -1,13 +1,14 @@
 import 'dart:convert';
-import 'dart:io' show Platform;
+import 'dart:io' show Platform, Directory;
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
-import 'package:sqflite_common_ffi_web/sqflite_ffi_web.dart'; // Import Web
+//import 'package:sqflite_common_ffi_web/sqflite_ffi_web.dart'; // Import Web
 import '../models/product.dart';
 import '../models/order_record.dart';
+import 'package:path_provider/path_provider.dart';
 
 class DatabaseHelper {
   static final DatabaseHelper instance = DatabaseHelper._init();
@@ -20,10 +21,13 @@ class DatabaseHelper {
   static void ensureInitialized() {
     if (_ffiInitialized) return;
 
-    if (kIsWeb) {
+
+
+    /*if (kIsWeb) {
       // Configuration SQLite pour navigateur Chrome / Web
       databaseFactory = databaseFactoryFfiWeb;
-    } else if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
+    } else if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) */
+    {
       // Configuration Desktop
       sqfliteFfiInit();
       databaseFactory = databaseFactoryFfi;
@@ -38,9 +42,24 @@ class DatabaseHelper {
     return _database!;
   }
 
+
   Future<Database> _initDB(String filePath) async {
     ensureInitialized();
-    final dbPath = await getDatabasesPath();
+
+    String dbPath;
+    if (!kIsWeb && (Platform.isIOS || Platform.isAndroid || Platform.isMacOS || Platform.isWindows || Platform.isLinux)) {
+      // Sur mobile et desktop, on utilise le répertoire Documents dédié à l'application
+      final docsDir = await getApplicationDocumentsDirectory();
+      dbPath = docsDir.path;
+    } else {
+      dbPath = await getDatabasesPath();
+    }
+
+    final directory = Directory(dbPath);
+    if (!await directory.exists()) {
+      await directory.create(recursive: true);
+    }
+
     final path = join(dbPath, filePath);
 
     return await openDatabase(
